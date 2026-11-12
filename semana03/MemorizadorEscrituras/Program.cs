@@ -69,7 +69,8 @@ class Program
                 if (recitacao != null && recitacao.Trim().ToLower() != "pular")
                 {
                     Console.WriteLine();
-                    int acerto = escritura.MostrarResultadoRecitacao(recitacao);
+                    MostrarResultadoColorido(escritura.ObterReferencia(), escritura.ObterTextoCorrigido(recitacao));
+                    int acerto = escritura.CalcularAcerto(recitacao);
                     Console.WriteLine();
                     Console.WriteLine($"Você acertou {acerto}% das palavras.");
                     Console.WriteLine(acerto == 100
@@ -110,6 +111,21 @@ class Program
                 escritura.OcultarPalavrasAleatorias(3);
             }
         }
+    }
+
+    // Mostra as palavras certas em verde e as que faltaram [entre colchetes] em vermelho.
+    static void MostrarResultadoColorido(string referencia, string textoCorrigido)
+    {
+        Console.Write(referencia + " ");
+
+        foreach (string palavra in textoCorrigido.Split(' '))
+        {
+            Console.ForegroundColor = palavra.StartsWith("[") ? ConsoleColor.Red : ConsoleColor.Green;
+            Console.Write(palavra + " ");
+        }
+
+        Console.ResetColor();
+        Console.WriteLine();
     }
 
     static string MontarBarraProgresso(int percentual)

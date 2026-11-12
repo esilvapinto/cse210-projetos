@@ -63,15 +63,34 @@ public class Escritura
     }
 
     // Compara o que o usuário digitou de memória com a escritura.
-    // Mostra as palavras certas em verde e as que faltaram ou erraram em vermelho, entre [ ].
-    // Retorna o percentual de acerto (0 a 100).
-    public int MostrarResultadoRecitacao(string tentativa)
+    // Retorna o texto da escritura com as palavras que faltaram ou erraram entre [ ].
+    public string ObterTextoCorrigido(string tentativa)
+    {
+        List<bool> resultado = ConferirRecitacao(tentativa);
+        List<string> partes = new List<string>();
+
+        for (int i = 0; i < _palavras.Count; i++)
+        {
+            string texto = _palavras[i].ObterTextoOriginal();
+            partes.Add(resultado[i] ? texto : "[" + texto + "]");
+        }
+
+        return string.Join(" ", partes);
+    }
+
+    // Percentual de palavras recitadas corretamente (0 a 100).
+    public int CalcularAcerto(string tentativa)
+    {
+        int acertos = ConferirRecitacao(tentativa).Count(certa => certa);
+        return acertos * 100 / _palavras.Count;
+    }
+
+    // Para cada palavra da escritura, diz se o usuário a digitou (true) ou não (false).
+    private List<bool> ConferirRecitacao(string tentativa)
     {
         string[] digitadas = tentativa.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        List<bool> resultado = new List<bool>();
         int posicao = 0;
-        int acertos = 0;
-
-        Console.Write(_referencia.ObterTextoExibicao() + " ");
 
         foreach (Palavra palavra in _palavras)
         {
@@ -89,21 +108,22 @@ public class Escritura
 
             if (encontrada >= 0)
             {
-                acertos++;
                 posicao = encontrada + 1;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write(palavra.ObterTextoOriginal() + " ");
+                resultado.Add(true);
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("[" + palavra.ObterTextoOriginal() + "] ");
+                resultado.Add(false);
             }
         }
 
-        Console.ResetColor();
-        Console.WriteLine();
-        return acertos * 100 / _palavras.Count;
+        return resultado;
+    }
+
+    // Retorna só a referência formatada (ex.: "João 3:16").
+    public string ObterReferencia()
+    {
+        return _referencia.ObterTextoExibicao();
     }
 
     // Percentual de palavras já ocultadas (0 a 100).
